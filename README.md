@@ -1,2 +1,2 @@
-# EmptyJSF
-Empty Maven Web JakartaEE (JSF) project
+# AIV-Naloga7
+- ### Spletni uporabniški vmesnik
