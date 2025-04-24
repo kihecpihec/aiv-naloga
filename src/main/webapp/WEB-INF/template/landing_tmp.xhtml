@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html">
+<h:head>
+	<title><ui:insert name="title">Default Title</ui:insert></title>
+	<h:outputStylesheet library="css" name="styles.css" />
+</h:head>
+<h:body styleClass="layout-body">
+	<div class="page-wrapper">
+		<header>
+			<h1>Welcome to Our Platform</h1>
+		</header>
+
+		<main>
+			<ui:insert name="content">
+				<p>Default content goes here.</p>
+			</ui:insert>
+		</main>
+
+		<footer>
+			<ui:insert name="footer">
+				<p>&#169; 2025 Hanan Mešić. All rights reserved.</p>
+			</ui:insert>
+		</footer>
+	</div>
+</h:body>
+</html>

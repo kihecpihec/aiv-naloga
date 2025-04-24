@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<h:head>
+    <title><ui:insert name="title">Provider Management</ui:insert></title>
+    <h:outputStylesheet library="css" name="providers.css" />
+</h:head>
+
+<h:body>
+
+    <!-- Header Section -->
+    <header>
+        <h1>EV Charging Management</h1>
+        <nav>
+            <h:link value="Dashboard" outcome="/dashboard.xhtml" />
+            <h:link value="Providers" outcome="/providers.xhtml" />
+            <h:link value="Users" outcome="/users.xhtml" />
+            <h:link value="Stations" outcome="/stations.xhtml" />
+        </nav>
+    </header>
+
+    <!-- Main Content Section -->
+    <main>
+        <div class="main-container">
+            <h2>Provider Management</h2>
+
+            <!-- Form to Add New Provider -->
+            <h:form id="providerForm">
+                <h3>Create New Provider</h3>
+                <div class="form-group">
+                    <h:outputLabel for="provider_name" value="Name: " />
+                    <h:inputText id="provider_name" value="#{bean.provider_name}" required="true" />
+                </div>
+                <div class="form-group">
+                    <h:outputLabel for="provider_email" value="Email: " />
+                    <h:inputText id="provider_email" value="#{bean.provider_email}" required="true" />
+                </div>
+                <h:commandButton value="Add Provider" action="#{bean.submitProvider}" update="providerTableForm" styleClass="button-link" />
+            </h:form>
+
+            <hr />
+
+            <!-- Table to Display Providers -->
+            <h:form id="providerTableForm">
+                <h3>Existing Providers</h3>
+                <h:dataTable id="providerTable" value="#{bean.providers}" var="provider" styleClass="user-table">
+                    <h:column headerText="Name">
+                        <f:facet name="header">Name</f:facet>
+                        <h:outputText value="#{provider.ime}" title="#{provider.ime}" />
+                    </h:column>
+
+                    <h:column headerText="Email">
+                        <f:facet name="header">Email</f:facet>
+                        <h:outputText value="#{provider.email}" title="#{provider.email}" />
+                    </h:column>
+
+                    <h:column headerText="Actions" styleClass="action-column">
+                        <h:commandButton value="Edit"
+                                         action="#{bean.setSelectedProvider(provider)}"
+                                         update="editPanel providerTableForm"
+                                         styleClass="button-link" />
+                        <h:commandButton value="Delete" action="#{bean.deleteProvider(provider)}" update="providerTableForm" styleClass="button-danger" />
+                    </h:column>
+                </h:dataTable>
+
+                <!-- Edit Modal Panel -->
+                <h:panelGroup id="editPanel" rendered="#{bean.showEditPanel}" layout="block" styleClass="modal">
+                    <div class="modal-content">
+                        <h:form id="editProviderForm">
+                            <h2>Edit Provider</h2>
+
+                            <div class="form-group">
+                                <h:outputLabel for="edit_provider_name" value="Name:" />
+                                <h:inputText id="edit_provider_name" value="#{bean.selectedProvider.ime}" required="true" />
+                            </div>
+
+                             <h:commandButton value="Save" action="#{bean.updateProvider}" update="providerTableForm editPanel" styleClass="button-link" />
+                            <h:commandButton value="Cancel" action="#{bean.cancelEdit}" update="editPanel" immediate="true" styleClass="button-danger" />
+                        </h:form>
+                    </div>
+                </h:panelGroup>
+
+            </h:form>
+        </div>
+    </main>
+
+</h:body>
+</html>

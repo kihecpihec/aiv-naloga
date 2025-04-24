@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<ui:composition template="/WEB-INF/template/dashboard_tmp.xhtml">
+    <ui:define name="title">EV Dashboard</ui:define>
+    <ui:define name="content">
+        <div class="dashboard-container">
+            <nav class="sidebar">
+                <div class="nav-links">
+                    <a href="providers.xhtml">Providers</a>
+                    <a href="stations.xhtml">Stations</a>
+                    <a href="users.xhtml">Users</a>
+                </div>
+                <div class="bottom-link">
+                    <a href="home.xhtml">Return Home</a>
+                </div>
+            </nav>
+            <main class="main-content">
+                <h1>Welcome to the EV Charging Dashboard</h1>
+                <p>Select a section from the menu to get started.</p>
+            </main>
+        </div>
+    </ui:define>
+</ui:composition>
+</html>

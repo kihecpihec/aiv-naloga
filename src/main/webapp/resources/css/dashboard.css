@@ -1,0 +1,54 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #F0EEE7; /* Matches landing background */
+    color: #222222;
+}
+
+.dashboard-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Sidebar styling with lighter neutral tones */
+.sidebar {
+    width: 170px;
+    background-color: #FAFAF6; /* Matches content cards on landing */
+    color: #222222;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1rem;
+    box-shadow: 2px 0 6px rgba(0,0,0,0.05); /* Soft shadow */
+}
+
+/* Navigation links in sidebar - Minimalist style */
+.nav-links a,
+.bottom-link a {
+    display: block;
+    color: #222222;
+    text-decoration: none;
+    margin: 0.75rem 0;
+    padding: 0.4rem 0.75rem;
+    border-radius: 4px;
+    background-color: transparent;
+    border: 1px solid #EFC3AC;
+    font-weight: 500;
+    text-align: left;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Hover effect with soft background tone */
+.nav-links a:hover,
+.bottom-link a:hover {
+    background-color: #EFC3AC;
+    color: #222222;
+    border-color: #E38B75;
+}
+
+/* Main content area */
+.main-content {
+    flex-grow: 1;
+    padding: 2rem;
+    background-color: #F0EEE7;
+}

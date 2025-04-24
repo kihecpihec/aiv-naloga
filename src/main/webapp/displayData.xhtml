@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core">
+<h:head>
+    <title>Display Data</title>
+</h:head>
+<h:body>
+    <f:view>
+    <a href="faces/userInputForm.xhtml">User Input Form</a>
+    <h:form>
+        <h:commandButton value="Display Providers" action="#{dataBean.displayProviders}" />
+        <h:commandButton value="Display Charging Stations" action="#{dataBean.displayChargingStations}" />
+        <h:commandButton value="Display Users" action="#{dataBean.displayUsers}" />
+    </h:form>
+
+    <h:dataTable value="#{dataBean.providers}" var="provider" rendered="#{not empty dataBean.providers}">
+        <h:column>
+            <f:facet name="header">Name</f:facet>
+            #{provider.ime}
+        </h:column>
+        <h:column>
+            <f:facet name="header">Email</f:facet>
+            #{provider.email}
+        </h:column>
+    </h:dataTable>
+
+    <h:dataTable value="#{dataBean.chargingStations}" var="station" rendered="#{not empty dataBean.chargingStations}">
+        <h:column>
+            <f:facet name="header">Name</f:facet>
+            #{station.ime}
+        </h:column>
+        <h:column>
+            <f:facet name="header">Location</f:facet>
+            #{station.lokacija}
+        </h:column>
+        <h:column>
+            <f:facet name="header">Speed</f:facet>
+            #{station.hitrostPolnjenja} kW
+        </h:column>
+    </h:dataTable>
+
+    <h:dataTable value="#{dataBean.users}" var="user" rendered="#{not empty dataBean.users}">
+        <h:column>
+            <f:facet name="header">Name</f:facet>
+            #{user.ime}
+        </h:column>
+        <h:column>
+            <f:facet name="header">Email</f:facet>
+            #{user.user_email}
+        </h:column>
+        <h:column>
+            <f:facet name="header">Balance</f:facet>
+            #{user.balance}
+        </h:column>
+        <h:column>
+            <f:facet name="header">Car Type</f:facet>
+            #{user.carType}
+        </h:column>
+    </h:dataTable>
+    </f:view>
+</h:body>
+</html>
