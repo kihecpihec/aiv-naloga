@@ -17,4 +17,5 @@ public interface PolnilnaPostajaDAOInterface {
     void updatePolnilnaPostajaIsActive(String ime, boolean isActive);
     void deletePolnilnaPostajaByIme(String ime);
     Optional<PolnilnaPostaja> getPolnilnaPostajaByHitrost(double hitrost);
+    boolean preveriPolnjenje(String stationName, String currentUserName);
 }

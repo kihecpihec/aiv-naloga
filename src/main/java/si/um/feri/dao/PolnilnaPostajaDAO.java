@@ -77,4 +77,11 @@ public class PolnilnaPostajaDAO implements PolnilnaPostajaDAOInterface {
     public void deletePolnilnaPostajaByIme(String ime) {
         polnilnePostaje.removeIf(polnilnaPostaja -> polnilnaPostaja.getIme().equals(ime));
     }
+
+    @Override
+    public boolean preveriPolnjenje(String stationName, String currentUserName) {
+        return polnilnePostaje.stream()
+                .filter(polnilnaPostaja -> polnilnaPostaja.getIme().equals(stationName))
+                .anyMatch(polnilnaPostaja -> polnilnaPostaja.getCurrentUser() != null && polnilnaPostaja.getCurrentUser().getIme().equals(currentUserName));
+    }
 }

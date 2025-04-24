@@ -1,11 +1,11 @@
 package si.um.feri.ui;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.enterprise.context.SessionScoped;
-import jakarta.inject.Named;
+import jakarta.ejb.EJB;
 import si.um.feri.dao.PolnilnaPostajaDAO;
 import si.um.feri.dao.PonudnikDAO;
 import si.um.feri.dao.UserDAO;
+import si.um.feri.ejb.PolnilnaPostajaDaoLocal;
 import si.um.feri.service.PolnilnaPostajaService;
 import si.um.feri.service.PonudnikService;
 import si.um.feri.service.UserService;
@@ -13,12 +13,16 @@ import si.um.feri.vao.PolnilnaPostaja;
 import si.um.feri.vao.Ponudnik;
 import si.um.feri.vao.User;
 
-import java.io.Serializable;
 import java.util.List;
 
-@Named
-@SessionScoped
-public class Bean implements Serializable {
+public class Bean {
+
+    @EJB
+    private PolnilnaPostajaDaoLocal polnilnaPostajaDao;
+
+    public boolean preveriPolnjenje(String stationName, String currentUserName) {
+        return polnilnaPostajaDao.preveriPolnjenje(stationName, currentUserName);
+    }
 
     private List<Ponudnik> providers;
     private List<PolnilnaPostaja> chargingStations;
