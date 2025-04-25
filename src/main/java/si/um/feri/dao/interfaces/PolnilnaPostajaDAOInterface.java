@@ -1,11 +1,13 @@
 package si.um.feri.dao.interfaces;
 
+import jakarta.ejb.Local;
 import si.um.feri.vao.PolnilnaPostaja;
 import si.um.feri.vao.Ponudnik;
 
 import java.util.List;
 import java.util.Optional;
 
+@Local
 public interface PolnilnaPostajaDAOInterface {
     void insertPolnilnaPostaja(PolnilnaPostaja polnilnaPostaja);
     List<PolnilnaPostaja> getPolnilnaPostajaByPonudnik(Ponudnik ponudnik);

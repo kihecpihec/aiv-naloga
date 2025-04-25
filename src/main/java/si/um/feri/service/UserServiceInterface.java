@@ -1,17 +1,21 @@
-package si.um.feri.dao.interfaces;
+package si.um.feri.service;
 
 import jakarta.ejb.Local;
 import si.um.feri.vao.User;
 
 import java.util.List;
-import java.util.Optional;
 
 @Local
-public interface UserDAOInterface {
-    void insertUser(User user);
+public interface UserServiceInterface {
+    void createUser(String ime, String email, double balance, String carType);
+
     List<User> getAllUsers();
-    Optional<User> getUserByEmail(String email);
+
+    User getUserByEmail(String email);
+
     void updateUser(User user);
+
     void updateUserEmail(String email, String newEmail);
+
     void deleteUserByEmail(String email);
 }

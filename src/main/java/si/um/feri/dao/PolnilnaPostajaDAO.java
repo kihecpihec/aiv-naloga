@@ -1,5 +1,6 @@
 package si.um.feri.dao;
 
+import jakarta.ejb.Stateless;
 import si.um.feri.dao.interfaces.PolnilnaPostajaDAOInterface;
 import si.um.feri.vao.PolnilnaPostaja;
 import si.um.feri.vao.Ponudnik;
@@ -8,18 +9,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Stateless
 public class PolnilnaPostajaDAO implements PolnilnaPostajaDAOInterface {
     private static PolnilnaPostajaDAO instance;
     private List<PolnilnaPostaja> polnilnePostaje = new ArrayList<>();
 
-    private PolnilnaPostajaDAO() {}
-
-    public static PolnilnaPostajaDAO getInstance() {
-        if (instance == null) {
-            instance = new PolnilnaPostajaDAO();
-        }
-        return instance;
-    }
+//    private PolnilnaPostajaDAO() {}
+//
+//    public static PolnilnaPostajaDAO getInstance() {
+//        if (instance == null) {
+//            instance = new PolnilnaPostajaDAO();
+//        }
+//        return instance;
+//    }
 
     @Override
     public void insertPolnilnaPostaja(PolnilnaPostaja polnilnaPostaja) {

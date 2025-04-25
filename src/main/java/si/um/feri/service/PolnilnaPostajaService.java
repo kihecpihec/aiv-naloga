@@ -1,12 +1,12 @@
 package si.um.feri.service;
 
+import jakarta.ejb.EJB;
+import jakarta.ejb.Stateless;
 import si.um.feri.chainofresponsibility.BalanceCheck;
 import si.um.feri.chainofresponsibility.CarTypeCheck;
 import si.um.feri.chainofresponsibility.Check;
 import si.um.feri.chainofresponsibility.IsAvailableCheck;
-import si.um.feri.dao.PolnilnaPostajaDAO;
 import si.um.feri.dao.interfaces.PolnilnaPostajaDAOInterface;
-import si.um.feri.observers.PolnilnicaDisplay;
 import si.um.feri.vao.PolnilnaPostaja;
 import si.um.feri.vao.Ponudnik;
 import si.um.feri.vao.User;
@@ -14,22 +14,28 @@ import si.um.feri.vao.User;
 import java.util.List;
 import java.util.Optional;
 
-public class PolnilnaPostajaService {
-    private final PolnilnaPostajaDAOInterface polnilnaPostajaDAO = PolnilnaPostajaDAO.getInstance();
-    private final PolnilnicaDisplay polnilnicaDisplay = new PolnilnicaDisplay();
+@Stateless
+public class PolnilnaPostajaService implements PolnilnaPostajaServiceInterface, startChargingInterface {
+    //private final PolnilnaPostajaDAOInterface polnilnaPostajaDAO = PolnilnaPostajaDAO.getInstance();
+    //private final PolnilnicaDisplay polnilnicaDisplay = new PolnilnicaDisplay();
 
+    @EJB
+    PolnilnaPostajaDAOInterface polnilnaPostajaDAOInterface;
+
+    @Override
     public void addPostaja(String ime, String lokacija, Ponudnik ponudnik, boolean isActive, double hitrostPolnjenja) {
         if (ime == null || ime.isEmpty()) {
             throw new IllegalArgumentException("Ime ne sme biti prazno");
         }
         PolnilnaPostaja postaja = new PolnilnaPostaja(ime, lokacija, ponudnik, isActive, hitrostPolnjenja);
-        polnilnaPostajaDAO.insertPolnilnaPostaja(postaja);
+        polnilnaPostajaDAOInterface.insertPolnilnaPostaja(postaja);
 
         ponudnik.addPolnilnaPostaja(postaja);
     }
 
+    @Override
     public void startCharging(String ime, User user) {
-        Optional<PolnilnaPostaja> postaja = polnilnaPostajaDAO.getPolnilnaPostajaByIme(ime);
+        Optional<PolnilnaPostaja> postaja = polnilnaPostajaDAOInterface.getPolnilnaPostajaByIme(ime);
         if (postaja.isEmpty()) {
             throw new IllegalArgumentException("Polnilna postaja ne obstaja");
         }
@@ -50,8 +56,9 @@ public class PolnilnaPostajaService {
         }
     }
 
+    @Override
     public void stopCharging(String ime) {
-        Optional<PolnilnaPostaja> postaja = polnilnaPostajaDAO.getPolnilnaPostajaByIme(ime);
+        Optional<PolnilnaPostaja> postaja = polnilnaPostajaDAOInterface.getPolnilnaPostajaByIme(ime);
         if (postaja.isEmpty()) {
             throw new IllegalArgumentException("Polnilna postaja ne obstaja");
         }
@@ -59,32 +66,62 @@ public class PolnilnaPostajaService {
         notifyDisplay();
     }
 
+    @Override
     public void updateStation(PolnilnaPostaja updatedPostaja) {
-        polnilnaPostajaDAO.updatePolnilnaPostaja(updatedPostaja);
+        polnilnaPostajaDAOInterface.updatePolnilnaPostaja(updatedPostaja);
     }
 
+    @Override
     public void updatePolnilnaPostaja(String oldIme, String newIme) {
-        polnilnaPostajaDAO.updatePolnilnaPostajaIme(oldIme, newIme);
+        polnilnaPostajaDAOInterface.updatePolnilnaPostajaIme(oldIme, newIme);
     }
 
+    @Override
     public void updatePolinlnaPostajaIsActive(String ime, boolean isActive) {
-        polnilnaPostajaDAO.updatePolnilnaPostajaIsActive(ime, isActive);
+        polnilnaPostajaDAOInterface.updatePolnilnaPostajaIsActive(ime, isActive);
     }
 
+    @Override
     public void deletePolnilnaPostajaByIme(String ime) {
-        polnilnaPostajaDAO.deletePolnilnaPostajaByIme(ime);
+        polnilnaPostajaDAOInterface.deletePolnilnaPostajaByIme(ime);
     }
 
+    @Override
     public Optional<PolnilnaPostaja> getPolnilnePostajeByIme(String ime) {
-        return polnilnaPostajaDAO.getPolnilnaPostajaByIme(ime);
+        return polnilnaPostajaDAOInterface.getPolnilnaPostajaByIme(ime);
     }
 
+    @Override
     public List<PolnilnaPostaja> getAllPolnilnePostaje() {
-        return polnilnaPostajaDAO.getAllPolnilnePostaje();
+        return polnilnaPostajaDAOInterface.getAllPolnilnePostaje();
     }
 
-    private void notifyDisplay() {
-        List<PolnilnaPostaja> allPostaje = polnilnaPostajaDAO.getAllPolnilnePostaje();
-        polnilnicaDisplay.update(allPostaje);
+    @Override
+    public void notifyDisplay() {
+        List<PolnilnaPostaja> allPostaje = polnilnaPostajaDAOInterface.getAllPolnilnePostaje();
+    }
+
+    @Override
+    public void canCharge(String ime, User user) {
+        System.out.println("Checking if charging is possible...");
+        Optional<PolnilnaPostaja> postaja = polnilnaPostajaDAOInterface.getPolnilnaPostajaByIme(ime);
+        if (postaja.isEmpty()) {
+            throw new IllegalArgumentException("Polnilna postaja ne obstaja");
+        }
+
+        Check isAvailableCheck = new IsAvailableCheck();
+        Check carTypeCheck = new CarTypeCheck();
+        Check balanceCheck = new BalanceCheck();
+
+        isAvailableCheck.setNext(carTypeCheck);
+        carTypeCheck.setNext(balanceCheck);
+
+        try {
+            isAvailableCheck.handleRequest(user, postaja.get());
+            postaja.get().startCharging(user);
+            notifyDisplay();
+        } catch (IllegalStateException e) {
+            System.err.println("Polnjenje ni mogoče: " + e.getMessage());
+        }
     }
 }
