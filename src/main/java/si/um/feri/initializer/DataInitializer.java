@@ -4,23 +4,17 @@ import jakarta.annotation.PostConstruct;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Singleton;
 import jakarta.ejb.Startup;
-import si.um.feri.dao.PolnilnaPostajaDAO;
-import si.um.feri.dao.PonudnikDAO;
-import si.um.feri.dao.UserDAO;
-import jakarta.ejb.EJB;
-import si.um.feri.service.PolnilnaPostajaServiceInterface;
+import si.um.feri.service.PolnilnaPostajaServiceLocal;
 import si.um.feri.service.PonudnikServiceInterface;
 import si.um.feri.service.UserServiceInterface;
-import si.um.feri.vao.PolnilnaPostaja;
 import si.um.feri.vao.Ponudnik;
-import si.um.feri.vao.User;
 
 @Singleton
 @Startup
 public class DataInitializer {
 
     @EJB
-    private PolnilnaPostajaServiceInterface polnilnaPostajaService;
+    private PolnilnaPostajaServiceLocal polnilnaPostajaService;
     @EJB
     private PonudnikServiceInterface ponudnikService;
     @EJB
@@ -28,27 +22,29 @@ public class DataInitializer {
 
     @PostConstruct
     public void init() {
+        ponudnikService.createPonudnik("Petrol", "info@petrol.si");
+        ponudnikService.createPonudnik("Elektro Ljubljana", "info@elektro-lj.si");
 
-//        ponudnikService ponudnikService = ponudnikService.getInstance();
-//        polnilnaPostajaService polnilnaPostajaService = polnilnaPostajaService.getInstance();
-//        userService userService = userService.getInstance();
+        Ponudnik petrol = ponudnikService.getPonudnikByEmail("info@petrol.si")
+                .orElseThrow(() -> new RuntimeException("Petrol ni bil najden po ustvarjanju!"));
+        Ponudnik elektroLJ = ponudnikService.getPonudnikByEmail("info@elektro-lj.si")
+                .orElseThrow(() -> new RuntimeException("Elektro Ljubljana ni bil najden po ustvarjanju!"));
 
-        Ponudnik ponudnik1 = new Ponudnik("Ponudnik1", "ponudnik1@example.com");
-        Ponudnik ponudnik2 = new Ponudnik("Ponudnik2", "ponudnik2@example.com");
+        polnilnaPostajaService.addPostaja("Petrol MB Center", "Maribor, Center", petrol, false, 50.0);
+        polnilnaPostajaService.addPostaja("Petrol Pobrežje", "Maribor, Pobrežje", petrol, false, 22.0);
+        polnilnaPostajaService.addPostaja("Elektro LJ Bežigrad", "Ljubljana, Bežigrad", elektroLJ, false, 75.0);
 
-        ponudnikService.createPonudnik(ponudnik1.getIme(), ponudnik1.getEmail());
-        ponudnikService.createPonudnik(ponudnik2.getIme(), ponudnik2.getEmail());
+        userService.createUser("Janez Novak", "janez.novak@example.com", 100.0, "elektricni");
+        userService.createUser("Marija Kovac", "marija.kovac@example.com", 80.0, "CarType2");
 
-        PolnilnaPostaja postaja1 = new PolnilnaPostaja("Postaja1", "Lokacija1", ponudnik1, false, 50.0);
-        PolnilnaPostaja postaja2 = new PolnilnaPostaja("Postaja2", "Lokacija2", ponudnik2, false, 75.0);
+        System.out.println("Data initialized!");
 
-        polnilnaPostajaService.addPostaja(postaja1.getIme(), postaja1.getLokacija(), postaja1.getPonudnik(), postaja1.isActive(), postaja1.getHitrostPolnjenja());
-        polnilnaPostajaService.addPostaja(postaja2.getIme(), postaja2.getLokacija(), postaja2.getPonudnik(), postaja2.isActive(), postaja2.getHitrostPolnjenja());
-
-        User user1 = new User("User1", "user1@example.com", 100.0, "CarType1");
-        User user2 = new User("User2", "user2@example.com", 80.0, "CarType2");
-
-        userService.createUser(user1.getIme(), user1.getEmail(), user1.getBalance(), user1.getCarType());
-        userService.createUser(user2.getIme(), user2.getEmail(), user2.getBalance(), user2.getCarType());
+        System.out.println("--- Ponudniki ---");
+        ponudnikService.getAllPonudnike().forEach(p -> {
+            System.out.println("Ponudnik: " + p.getIme() + ", št. postaj: " + p.getPolnilnePostaje().size());
+            p.getPolnilnePostaje().forEach(pp -> System.out.println("  -> Postaja: " + pp.getIme()));
+        });
+        System.out.println("--- Uporabniki ---");
+        userService.getAllUsers().forEach(u -> System.out.println("Uporabnik: " + u.getIme() + ", Car: " + u.getCarType()));
     }
 }

@@ -1,17 +1,14 @@
 package si.um.feri.vao;
 
-import si.um.feri.observers.PonudnikNotifier;
-import si.um.feri.observers.UserNotifier;
-
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Ponudnik {
+public class Ponudnik implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String ime;
     private String email;
     private List<PolnilnaPostaja> polnilnePostaje;
-    private List<UserNotifier> userObservers = new ArrayList<>();
-    private List<PonudnikNotifier> ponudnikObservers = new ArrayList<>();
 
     public Ponudnik(String ime, String email) {
         this.ime = ime;
@@ -40,28 +37,10 @@ public class Ponudnik {
     }
 
     public void addPolnilnaPostaja(PolnilnaPostaja postaja) {
+        if (this.polnilnePostaje == null) {
+            this.polnilnePostaje = new ArrayList<>();
+        }
         polnilnePostaje.add(postaja);
-        notifyUsers(postaja, "added");
-    }
-
-    public void addUserObserver(UserNotifier observer) {
-        userObservers.add(observer);
-    }
-
-    public void addPonudnikObserver(PonudnikNotifier observer) {
-        ponudnikObservers.add(observer);
-    }
-
-    public void notifyUsers(PolnilnaPostaja postaja, String action) {
-        for (UserNotifier userObserver : userObservers) {
-            userObserver.update(this, postaja, action);
-        }
-    }
-
-    public void notifyPonudnike(PolnilnaPostaja postaja, String action) {
-        for (PonudnikNotifier ponudnikObserver : ponudnikObservers) {
-            ponudnikObserver.update(this, postaja, action);
-        }
     }
 
     @Override
@@ -69,6 +48,7 @@ public class Ponudnik {
         return "Ponudnik{" +
                 "ime='" + ime + '\'' +
                 ", email='" + email + '\'' +
+                ", steviloPostaj=" + (polnilnePostaje != null ? polnilnePostaje.size() : 0) +
                 '}';
     }
 }

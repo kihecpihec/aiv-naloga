@@ -15,9 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Stateless
-public class PolnilnaPostajaService implements PolnilnaPostajaServiceInterface, startChargingInterface {
-    //private final PolnilnaPostajaDAOInterface polnilnaPostajaDAO = PolnilnaPostajaDAO.getInstance();
-    //private final PolnilnicaDisplay polnilnicaDisplay = new PolnilnicaDisplay();
+public class PolnilnaPostajaService implements PolnilnaPostajaServiceLocal, PolnilnaPostajaServiceRemote {
 
     @EJB
     PolnilnaPostajaDAOInterface polnilnaPostajaDAOInterface;
@@ -30,15 +28,18 @@ public class PolnilnaPostajaService implements PolnilnaPostajaServiceInterface, 
         PolnilnaPostaja postaja = new PolnilnaPostaja(ime, lokacija, ponudnik, isActive, hitrostPolnjenja);
         polnilnaPostajaDAOInterface.insertPolnilnaPostaja(postaja);
 
-        ponudnik.addPolnilnaPostaja(postaja);
+        if (ponudnik != null) {
+            ponudnik.addPolnilnaPostaja(postaja);
+        }
     }
 
     @Override
     public void startCharging(String ime, User user) {
-        Optional<PolnilnaPostaja> postaja = polnilnaPostajaDAOInterface.getPolnilnaPostajaByIme(ime);
-        if (postaja.isEmpty()) {
-            throw new IllegalArgumentException("Polnilna postaja ne obstaja");
+        Optional<PolnilnaPostaja> postajaOpt = polnilnaPostajaDAOInterface.getPolnilnaPostajaByIme(ime);
+        if (postajaOpt.isEmpty()) {
+            throw new IllegalArgumentException("Polnilna postaja '" + ime + "' ne obstaja");
         }
+        PolnilnaPostaja postaja = postajaOpt.get();
 
         Check isAvailableCheck = new IsAvailableCheck();
         Check carTypeCheck = new CarTypeCheck();
@@ -48,22 +49,49 @@ public class PolnilnaPostajaService implements PolnilnaPostajaServiceInterface, 
         carTypeCheck.setNext(balanceCheck);
 
         try {
-            isAvailableCheck.handleRequest(user, postaja.get());
-            postaja.get().startCharging(user);
-            notifyDisplay();
+            isAvailableCheck.handleRequest(user, postaja);
+            postaja.startCharging(user);
+            polnilnaPostajaDAOInterface.updatePolnilnaPostaja(postaja);
         } catch (IllegalStateException e) {
-            System.err.println("Polnjenje ni mogoče: " + e.getMessage());
+            System.err.println("Polnjenje ni mogoče začeti: " + e.getMessage());
+            throw e;
         }
     }
 
     @Override
     public void stopCharging(String ime) {
-        Optional<PolnilnaPostaja> postaja = polnilnaPostajaDAOInterface.getPolnilnaPostajaByIme(ime);
-        if (postaja.isEmpty()) {
-            throw new IllegalArgumentException("Polnilna postaja ne obstaja");
+        Optional<PolnilnaPostaja> postajaOpt = polnilnaPostajaDAOInterface.getPolnilnaPostajaByIme(ime);
+        if (postajaOpt.isEmpty()) {
+            throw new IllegalArgumentException("Polnilna postaja '" + ime + "' ne obstaja");
         }
-        postaja.get().stopCharging();
-        notifyDisplay();
+        PolnilnaPostaja postaja = postajaOpt.get();
+        postaja.stopCharging();
+        polnilnaPostajaDAOInterface.updatePolnilnaPostaja(postaja);
+    }
+
+    @Override
+    public boolean canCharge(String ime, User user) throws ChargingNotPossibleException {
+        System.out.println("Lokalno preverjanje možnosti polnjenja za: " + ime);
+        Optional<PolnilnaPostaja> postajaOpt = polnilnaPostajaDAOInterface.getPolnilnaPostajaByIme(ime);
+        if (postajaOpt.isEmpty()) {
+            throw new ChargingNotPossibleException("Polnilna postaja '" + ime + "' ne obstaja.");
+        }
+        PolnilnaPostaja postaja = postajaOpt.get();
+
+        Check isAvailableCheck = new IsAvailableCheck();
+        Check carTypeCheck = new CarTypeCheck();
+        Check balanceCheck = new BalanceCheck();
+
+        isAvailableCheck.setNext(carTypeCheck);
+        carTypeCheck.setNext(balanceCheck);
+
+        try {
+            isAvailableCheck.handleRequest(user, postaja);
+            return true;
+        } catch (IllegalStateException e) {
+            System.err.println("Lokalno preverjanje: Polnjenje ni mogoče na postaji '" + ime + "': " + e.getMessage());
+            throw new ChargingNotPossibleException("Polnjenje ni mogoče: " + e.getMessage(), e);
+        }
     }
 
     @Override
@@ -73,12 +101,26 @@ public class PolnilnaPostajaService implements PolnilnaPostajaServiceInterface, 
 
     @Override
     public void updatePolnilnaPostaja(String oldIme, String newIme) {
-        polnilnaPostajaDAOInterface.updatePolnilnaPostajaIme(oldIme, newIme);
+        Optional<PolnilnaPostaja> postajaOpt = polnilnaPostajaDAOInterface.getPolnilnaPostajaByIme(oldIme);
+        if (postajaOpt.isPresent()){
+            PolnilnaPostaja p = postajaOpt.get();
+            p.setIme(newIme);
+            polnilnaPostajaDAOInterface.updatePolnilnaPostaja(p);
+        } else {
+            throw new IllegalArgumentException("Polnilna postaja " + oldIme + " ne obstaja.");
+        }
     }
 
     @Override
     public void updatePolinlnaPostajaIsActive(String ime, boolean isActive) {
-        polnilnaPostajaDAOInterface.updatePolnilnaPostajaIsActive(ime, isActive);
+        Optional<PolnilnaPostaja> postajaOpt = polnilnaPostajaDAOInterface.getPolnilnaPostajaByIme(ime);
+        if (postajaOpt.isPresent()){
+            PolnilnaPostaja p = postajaOpt.get();
+            p.setActive(isActive);
+            polnilnaPostajaDAOInterface.updatePolnilnaPostaja(p);
+        } else {
+            throw new IllegalArgumentException("Polnilna postaja " + ime + " ne obstaja.");
+        }
     }
 
     @Override
@@ -97,17 +139,14 @@ public class PolnilnaPostajaService implements PolnilnaPostajaServiceInterface, 
     }
 
     @Override
-    public void notifyDisplay() {
-        List<PolnilnaPostaja> allPostaje = polnilnaPostajaDAOInterface.getAllPolnilnePostaje();
-    }
+    public boolean preveriMoznostPolnjenja(String imePostaje, User user) throws ChargingNotPossibleException {
+        System.out.println("Oddaljeno preverjanje možnosti polnjenja za postajo: " + imePostaje);
 
-    @Override
-    public void canCharge(String ime, User user) {
-        System.out.println("Checking if charging is possible...");
-        Optional<PolnilnaPostaja> postaja = polnilnaPostajaDAOInterface.getPolnilnaPostajaByIme(ime);
-        if (postaja.isEmpty()) {
-            throw new IllegalArgumentException("Polnilna postaja ne obstaja");
+        Optional<PolnilnaPostaja> postajaOpt = polnilnaPostajaDAOInterface.getPolnilnaPostajaByIme(imePostaje);
+        if (postajaOpt.isEmpty()) {
+            throw new ChargingNotPossibleException("Polnilna postaja '" + imePostaje + "' ne obstaja.");
         }
+        PolnilnaPostaja postaja = postajaOpt.get();
 
         Check isAvailableCheck = new IsAvailableCheck();
         Check carTypeCheck = new CarTypeCheck();
@@ -117,11 +156,11 @@ public class PolnilnaPostajaService implements PolnilnaPostajaServiceInterface, 
         carTypeCheck.setNext(balanceCheck);
 
         try {
-            isAvailableCheck.handleRequest(user, postaja.get());
-            postaja.get().startCharging(user);
-            notifyDisplay();
+            isAvailableCheck.handleRequest(user, postaja);
+            return true;
         } catch (IllegalStateException e) {
-            System.err.println("Polnjenje ni mogoče: " + e.getMessage());
+            System.err.println("Oddaljeno preverjanje: Polnjenje ni mogoče na postaji '" + imePostaje + "': " + e.getMessage());
+            throw new ChargingNotPossibleException("Polnjenje ni mogoče: " + e.getMessage(), e);
         }
     }
 }

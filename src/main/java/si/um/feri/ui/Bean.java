@@ -16,7 +16,7 @@ import java.util.List;
 public class Bean implements java.io.Serializable {
 
     @EJB
-    private PolnilnaPostajaServiceInterface polnilnaPostajaService;
+    private PolnilnaPostajaServiceLocal polnilnaPostajaService;
     @EJB
     private PonudnikServiceInterface ponudnikService;
     @EJB
