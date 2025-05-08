@@ -137,7 +137,7 @@ public class PolnilnaPostajaService implements PolnilnaPostajaServiceLocal, Poln
     public List<PolnilnaPostaja> getAllPolnilnePostaje() {
         return polnilnaPostajaDAOInterface.getAllPolnilnePostaje();
     }
-
+//
     @Override
     public boolean preveriMoznostPolnjenja(String imePostaje, User user) throws ChargingNotPossibleException {
         System.out.println("Oddaljeno preverjanje možnosti polnjenja za postajo: " + imePostaje);
