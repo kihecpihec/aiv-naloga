@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Stateless
 public class UserDAO implements UserDAOInterface {
-    private static UserDAO instance;
+//    private static UserDAO instance;
     private List<User> users = new ArrayList<>();
 
 //    private UserDAO() {}

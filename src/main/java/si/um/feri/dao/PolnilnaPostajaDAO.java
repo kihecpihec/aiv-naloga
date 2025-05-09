@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Stateless
 public class PolnilnaPostajaDAO implements PolnilnaPostajaDAOInterface {
-    private static PolnilnaPostajaDAO instance;
+//    private static PolnilnaPostajaDAO instance;
     private List<PolnilnaPostaja> polnilnePostaje = new ArrayList<>();
 
 //    private PolnilnaPostajaDAO() {}

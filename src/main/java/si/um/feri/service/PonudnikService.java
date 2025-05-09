@@ -2,18 +2,14 @@ package si.um.feri.service;
 
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
-import si.um.feri.dao.PonudnikDAO;
 import si.um.feri.dao.interfaces.PonudnikDAOInterface;
 import si.um.feri.vao.Ponudnik;
-import si.um.feri.vao.User;
 
 import java.util.List;
 import java.util.Optional;
 
 @Stateless
 public class PonudnikService implements PonudnikServiceInterface {
-    //private final PonudnikDAOInterface ponudnikDAO = PonudnikDAO.getInstance();
-
     @EJB
     PonudnikDAOInterface ponudnikDAO;
 

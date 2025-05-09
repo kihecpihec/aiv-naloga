@@ -2,8 +2,6 @@ package si.um.feri.service;
 
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
-import si.um.feri.dao.UserDAO;
-import si.um.feri.dao.interfaces.PonudnikDAOInterface;
 import si.um.feri.dao.interfaces.UserDAOInterface;
 import si.um.feri.vao.User;
 
@@ -11,8 +9,6 @@ import java.util.List;
 
 @Stateless
 public class UserService implements UserServiceInterface {
-    //private final UserDAOInterface userDAO = UserDAO.getInstance();
-
     @EJB
     UserDAOInterface userDAO;
 

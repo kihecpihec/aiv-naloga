@@ -71,7 +71,7 @@ public class PolnilnaPostajaService implements PolnilnaPostajaServiceLocal, Poln
 
     @Override
     public boolean canCharge(String ime, User user) throws ChargingNotPossibleException {
-        System.out.println("Lokalno preverjanje možnosti polnjenja za: " + ime);
+        System.out.println("Lokalno preverjanje polnjenja za: " + ime);
         Optional<PolnilnaPostaja> postajaOpt = polnilnaPostajaDAOInterface.getPolnilnaPostajaByIme(ime);
         if (postajaOpt.isEmpty()) {
             throw new ChargingNotPossibleException("Polnilna postaja '" + ime + "' ne obstaja.");
@@ -137,10 +137,10 @@ public class PolnilnaPostajaService implements PolnilnaPostajaServiceLocal, Poln
     public List<PolnilnaPostaja> getAllPolnilnePostaje() {
         return polnilnaPostajaDAOInterface.getAllPolnilnePostaje();
     }
-//
+
     @Override
     public boolean preveriMoznostPolnjenja(String imePostaje, User user) throws ChargingNotPossibleException {
-        System.out.println("Oddaljeno preverjanje možnosti polnjenja za postajo: " + imePostaje);
+        System.out.println("Oddaljeno preverjanje polnjenja za postajo: " + imePostaje);
 
         Optional<PolnilnaPostaja> postajaOpt = polnilnaPostajaDAOInterface.getPolnilnaPostajaByIme(imePostaje);
         if (postajaOpt.isEmpty()) {

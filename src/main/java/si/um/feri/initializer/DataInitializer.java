@@ -31,20 +31,10 @@ public class DataInitializer {
                 .orElseThrow(() -> new RuntimeException("Elektro Ljubljana ni bil najden po ustvarjanju!"));
 
         polnilnaPostajaService.addPostaja("Petrol MB Center", "Maribor, Center", petrol, false, 50.0);
-        polnilnaPostajaService.addPostaja("Petrol Pobrežje", "Maribor, Pobrežje", petrol, false, 22.0);
+        polnilnaPostajaService.addPostaja("Petrol Pobrežje", "Maribor, Pobrežje", petrol, true, 22.0);
         polnilnaPostajaService.addPostaja("Elektro LJ Bežigrad", "Ljubljana, Bežigrad", elektroLJ, false, 75.0);
 
         userService.createUser("Janez Novak", "janez.novak@example.com", 100.0, "elektricni");
         userService.createUser("Marija Kovac", "marija.kovac@example.com", 80.0, "CarType2");
-
-        System.out.println("Data initialized!");
-
-        System.out.println("--- Ponudniki ---");
-        ponudnikService.getAllPonudnike().forEach(p -> {
-            System.out.println("Ponudnik: " + p.getIme() + ", št. postaj: " + p.getPolnilnePostaje().size());
-            p.getPolnilnePostaje().forEach(pp -> System.out.println("  -> Postaja: " + pp.getIme()));
-        });
-        System.out.println("--- Uporabniki ---");
-        userService.getAllUsers().forEach(u -> System.out.println("Uporabnik: " + u.getIme() + ", Car: " + u.getCarType()));
     }
 }

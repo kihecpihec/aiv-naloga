@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Stateless
 public class PonudnikDAO implements PonudnikDAOInterface {
-    private static PonudnikDAO instance;
+//    private static PonudnikDAO instance;
     private List<Ponudnik> ponudniki = new ArrayList<>();
 
 //    private PonudnikDAO() {}

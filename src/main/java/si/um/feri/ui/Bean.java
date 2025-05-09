@@ -2,10 +2,8 @@ package si.um.feri.ui;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.ejb.EJB;
-import si.um.feri.dao.PolnilnaPostajaDAO;
-import si.um.feri.dao.PonudnikDAO;
-import si.um.feri.dao.UserDAO;
-import si.um.feri.dao.interfaces.PolnilnaPostajaDAOInterface;
+import jakarta.enterprise.context.SessionScoped;
+import jakarta.inject.Named;
 import si.um.feri.service.*;
 import si.um.feri.vao.PolnilnaPostaja;
 import si.um.feri.vao.Ponudnik;
@@ -13,6 +11,8 @@ import si.um.feri.vao.User;
 
 import java.util.List;
 
+@Named("bean")
+@SessionScoped
 public class Bean implements java.io.Serializable {
 
     @EJB
@@ -27,19 +27,16 @@ public class Bean implements java.io.Serializable {
     private List<User> users;
     private boolean showEditPanel = false;
 
-    // User details
     private String user_name;
     private String user_email;
     private double balance;
     private String carType;
     private User selectedUser;
 
-    // Provider details
     private String provider_name;
     private String provider_email;
     private Ponudnik selectedProvider;
 
-    // Station details
     private String station_name;
     private String station_location;
     private Ponudnik provider;
@@ -47,12 +44,10 @@ public class Bean implements java.io.Serializable {
     private double station_chargingSpeed;
     private PolnilnaPostaja selectedStation;
 
-    // DAO instances
     //userService userService = userService.getInstance();
     //PonudnikDAO ponudnikDAO = PonudnikDAO.getInstance();
     //PolnilnaPostajaDAO stationDAO = PolnilnaPostajaDAO.getInstance();
 
-    // Service instances
     //UserService userService = new UserService();
     //PonudnikService providerService = new PonudnikService();
     //PolnilnaPostajaService polnilnaPostajaService = new PolnilnaPostajaService();
