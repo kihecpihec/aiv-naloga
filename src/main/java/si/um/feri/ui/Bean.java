@@ -1,43 +1,42 @@
 package si.um.feri.ui;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.ejb.EJB;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Named;
-import si.um.feri.dao.PolnilnaPostajaDAO;
-import si.um.feri.dao.PonudnikDAO;
-import si.um.feri.dao.UserDAO;
-import si.um.feri.service.PolnilnaPostajaService;
-import si.um.feri.service.PonudnikService;
-import si.um.feri.service.UserService;
+import si.um.feri.service.*;
 import si.um.feri.vao.PolnilnaPostaja;
 import si.um.feri.vao.Ponudnik;
 import si.um.feri.vao.User;
 
-import java.io.Serializable;
 import java.util.List;
 
-@Named
+@Named("bean")
 @SessionScoped
-public class Bean implements Serializable {
+public class Bean implements java.io.Serializable {
+
+    @EJB
+    private PolnilnaPostajaServiceLocal polnilnaPostajaService;
+    @EJB
+    private PonudnikServiceInterface ponudnikService;
+    @EJB
+    private UserServiceInterface userService;
 
     private List<Ponudnik> providers;
     private List<PolnilnaPostaja> chargingStations;
     private List<User> users;
     private boolean showEditPanel = false;
 
-    // User details
     private String user_name;
     private String user_email;
     private double balance;
     private String carType;
     private User selectedUser;
 
-    // Provider details
     private String provider_name;
     private String provider_email;
     private Ponudnik selectedProvider;
 
-    // Station details
     private String station_name;
     private String station_location;
     private Ponudnik provider;
@@ -45,15 +44,13 @@ public class Bean implements Serializable {
     private double station_chargingSpeed;
     private PolnilnaPostaja selectedStation;
 
-    // DAO instances
-    UserDAO userDAO = UserDAO.getInstance();
-    PonudnikDAO ponudnikDAO = PonudnikDAO.getInstance();
-    PolnilnaPostajaDAO stationDAO = PolnilnaPostajaDAO.getInstance();
+    //userService userService = userService.getInstance();
+    //PonudnikDAO ponudnikDAO = PonudnikDAO.getInstance();
+    //PolnilnaPostajaDAO stationDAO = PolnilnaPostajaDAO.getInstance();
 
-    // Service instances
-    UserService userService = new UserService();
-    PonudnikService providerService = new PonudnikService();
-    PolnilnaPostajaService stationService = new PolnilnaPostajaService();
+    //UserService userService = new UserService();
+    //PonudnikService providerService = new PonudnikService();
+    //PolnilnaPostajaService polnilnaPostajaService = new PolnilnaPostajaService();
 
     public String getUser_name() {
         return user_name;
@@ -88,25 +85,25 @@ public class Bean implements Serializable {
     }
 
     public void deleteUser(User user) {
-        userDAO.deleteUserByEmail(user.getEmail());
+        userService.deleteUserByEmail(user.getEmail());
         System.out.println("User deleted: " + user);
     }
 
     public void submitUser() {
         User user = new User(user_name, user_email, balance, carType);
-        userDAO.insertUser(user);
+        userService.createUser(user_name, user_email, balance, carType);
         System.out.println("User added: " + user);
     }
 
     public void submitProvider() {
         Ponudnik provider = new Ponudnik(provider_name, provider_email);
-        ponudnikDAO.insertPonudnik(provider);
+        ponudnikService.createPonudnik(provider_name, provider_email);
         displayProviders();
         System.out.println("Provider added: " + provider);
     }
 
     public void deleteProvider(Ponudnik provider) {
-        ponudnikDAO.deletePonudnikByEmail(provider.getEmail());
+        ponudnikService.deletePonudnikByEmail(provider.getEmail());
         displayProviders();
         System.out.println("Provider deleted: " + provider);
     }
@@ -166,13 +163,13 @@ public class Bean implements Serializable {
 
     public void submitStation() {
         PolnilnaPostaja station = new PolnilnaPostaja(station_name, station_location, provider, isActive, station_chargingSpeed);
-        stationDAO.insertPolnilnaPostaja(station);
+        polnilnaPostajaService.addPostaja(station_name, station_location, provider, isActive, station_chargingSpeed);
         displayStations();
         System.out.println("Station added: " + station);
     }
 
     public void deleteStation(PolnilnaPostaja station) {
-        stationDAO.deletePolnilnaPostajaByIme(station.getIme());
+        polnilnaPostajaService.deletePolnilnaPostajaByIme(station.getIme());
         displayStations();
         System.out.println("Station deleted: " + station);
     }
@@ -242,7 +239,7 @@ public class Bean implements Serializable {
 
     public void updateProvider() {
         if (selectedProvider != null) {
-            providerService.updateProvider(selectedProvider);
+            ponudnikService.updateProvider(selectedProvider);
             System.out.println("Provider updated: " + selectedProvider);
             displayProviders();
         } else {
@@ -254,7 +251,7 @@ public class Bean implements Serializable {
 
     public void updateStation() {
         if (selectedStation != null) {
-            stationService.updateStation(selectedStation);
+            polnilnaPostajaService.updateStation(selectedStation);
             System.out.println("Station updated: " + selectedStation);
             displayStations();
         } else {
@@ -269,17 +266,17 @@ public class Bean implements Serializable {
     }
 
     public void displayProviders() {
-        providers = PonudnikDAO.getInstance().getAllPonudnike();
+        providers = ponudnikService.getAllPonudnike();
         providers.forEach(provider -> System.out.println("Provider: " + provider.getIme() + ", Email: " + provider.getEmail()));
     }
 
     public void displayUsers() {
-        users = UserDAO.getInstance().getAllUsers();
+        users = userService.getAllUsers();
         users.forEach(user -> System.out.println("User: " + user.getIme() + ", Email: " + user.getEmail() + ", Balance: " + user.getBalance() + ", Car Type: " + user.getCarType()));
     }
 
     public void displayStations() {
-        chargingStations = PolnilnaPostajaDAO.getInstance().getAllPolnilnePostaje();
+        chargingStations = polnilnaPostajaService.getAllPolnilnePostaje();
         chargingStations.forEach(station -> System.out.println("Station: " + station.getIme() + ", Location: " + station.getLokacija() + ", Speed: " + station.getHitrostPolnjenja() + " kW"));
     }
 

@@ -1,6 +1,9 @@
 package si.um.feri.vao;
 
-public class PolnilnaPostaja {
+import java.io.Serializable;
+
+public class PolnilnaPostaja implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String ime;
     private String lokacija;
     private Ponudnik ponudnik;
@@ -26,7 +29,7 @@ public class PolnilnaPostaja {
     }
 
     public String getLokacija() {
-        return this.lokacija;
+        return lokacija;
     }
 
     public void setLokacija(String lokacija) {
@@ -35,6 +38,10 @@ public class PolnilnaPostaja {
 
     public Ponudnik getPonudnik() {
         return ponudnik;
+    }
+
+    public void setPonudnik(Ponudnik ponudnik) {
+        this.ponudnik = ponudnik;
     }
 
     public double getHitrostPolnjenja() {
@@ -46,16 +53,16 @@ public class PolnilnaPostaja {
     }
 
     public void startCharging(User user) {
-        if (this.isActive) {
-            throw new IllegalStateException("Polnilna postaja je že aktivna.");
+        if (this.currentUser != null) {
+            throw new IllegalStateException("Polnilna postaja je že zasedena s strani uporabnika: " + this.currentUser.getIme());
         }
         this.currentUser = user;
         this.setActive(true);
     }
 
     public void stopCharging() {
-        if (!this.isActive) {
-            throw new IllegalStateException("Polnilna postaja ni aktivna.");
+        if (this.currentUser == null) {
+            throw new IllegalStateException("Nihče ne polni na tej postaji.");
         }
         this.currentUser = null;
         this.setActive(false);
@@ -66,14 +73,7 @@ public class PolnilnaPostaja {
     }
 
     public void setActive(boolean active) {
-        isActive = active;
-        if (isActive) {
-            ponudnik.notifyUsers(this, "zasedeno");
-            ponudnik.notifyPonudnike(this, "zasedeno");
-        } else {
-            ponudnik.notifyUsers(this, "prosto");
-            ponudnik.notifyPonudnike(this, "prosto");
-        }
+        this.isActive = active;
     }
 
     public User getCurrentUser() {
@@ -82,10 +82,11 @@ public class PolnilnaPostaja {
 
     public void setCurrentUser(User currentUser) {
         this.currentUser = currentUser;
-    }
-
-    public void setPonudnik(Ponudnik ponudnik) {
-        this.ponudnik = ponudnik;
+        if (this.currentUser != null && !this.isActive) {
+            this.setActive(true);
+        } else if (this.currentUser == null && this.isActive) {
+            this.setActive(false);
+        }
     }
 
     @Override
@@ -93,8 +94,10 @@ public class PolnilnaPostaja {
         return "PolnilnaPostaja{" +
                 "ime='" + ime + '\'' +
                 ", lokacija='" + lokacija + '\'' +
+                ", ponudnik=" + (ponudnik != null ? ponudnik.getIme() : "null") +
                 ", isActive=" + isActive +
                 ", hitrostPolnjenja=" + hitrostPolnjenja + " kW" +
+                ", currentUser=" + (currentUser != null ? currentUser.getIme() : "null") +
                 '}';
     }
 }

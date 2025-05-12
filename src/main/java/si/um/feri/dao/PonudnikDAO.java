@@ -1,5 +1,6 @@
 package si.um.feri.dao;
 
+import jakarta.ejb.Stateless;
 import si.um.feri.dao.interfaces.PonudnikDAOInterface;
 import si.um.feri.vao.Ponudnik;
 
@@ -7,18 +8,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+
+@Stateless
 public class PonudnikDAO implements PonudnikDAOInterface {
-    private static PonudnikDAO instance;
+//    private static PonudnikDAO instance;
     private List<Ponudnik> ponudniki = new ArrayList<>();
 
-    private PonudnikDAO() {}
-
-    public static PonudnikDAO getInstance() {
-        if (instance == null) {
-            instance = new PonudnikDAO();
-        }
-        return instance;
-    }
+//    private PonudnikDAO() {}
+//
+//    public static PonudnikDAO getInstance() {
+//        if (instance == null) {
+//            instance = new PonudnikDAO();
+//        }
+//        return instance;
+//    }
 
     @Override
     public void insertPonudnik(Ponudnik ponudnik) {

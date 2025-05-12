@@ -1,5 +1,6 @@
 package si.um.feri.dao;
 
+import jakarta.ejb.Stateless;
 import si.um.feri.dao.interfaces.UserDAOInterface;
 import si.um.feri.vao.User;
 
@@ -7,18 +8,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Stateless
 public class UserDAO implements UserDAOInterface {
-    private static UserDAO instance;
+//    private static UserDAO instance;
     private List<User> users = new ArrayList<>();
 
-    private UserDAO() {}
-
-    public static UserDAO getInstance() {
-        if (instance == null) {
-            instance = new UserDAO();
-        }
-        return instance;
-    }
+//    private UserDAO() {}
+//
+//    public static UserDAO getInstance() {
+//        if (instance == null) {
+//            instance = new UserDAO();
+//        }
+//        return instance;
+//    }
 
     @Override
     public void insertUser(User user) {
